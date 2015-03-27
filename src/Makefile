@@ -1,13 +1,13 @@
-CC = g++
+CC = gcc
 LIBS = -lpthread
-
-DEPS = task.hpp sched_new.h
-OBJ = main.o task.o
+CFLAGS = -Wall -O0
+DEPS = task.hpp sched_new.h periodicity.h
+OBJ = main.o task.o periodicity.o sched_new.o
 TARGET = spawner
 
 all: $(TARGET)
 
-%.o: %.cpp $(DEPS)
+%.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS) $(LIBS)
 
 $(TARGET): $(OBJ)

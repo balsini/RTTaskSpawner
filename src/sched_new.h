@@ -1,12 +1,21 @@
-#ifndef __SCHED_NEW_H__
-#define __SCHED_NEW_H__
+#ifndef SCHED_NEW_H
+#define SCHED_NEW_H
 
-#include <linux/kernel.h>
-#include <linux/unistd.h>
-#include <linux/types.h>
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
+#include <linux/unistd.h>
+#include <linux/kernel.h>
+#include <linux/types.h>
+#include <sys/syscall.h>
+#include <pthread.h>
 
-#define SCHED_DEADLINE          6
+#define gettid() syscall(__NR_gettid)
+
+#define SCHED_DEADLINE	6
 
 /* XXX use the proper syscall numbers */
 #ifdef __x86_64__
@@ -24,8 +33,7 @@
 #define __NR_sched_getattr		381
 #endif
 
-#define SF_SIG_RORUN	2
-#define SF_SIG_DMISS	4
+static volatile int done;
 
 struct sched_attr {
   __u32 size;
@@ -39,16 +47,19 @@ struct sched_attr {
   /* SCHED_FIFO, SCHED_RR */
   __u32 sched_priority;
 
-  /* SCHED_DEADLINE */
+  /* SCHED_DEADLINE (nsec) */
   __u64 sched_runtime;
   __u64 sched_deadline;
   __u64 sched_period;
 };
 
-#define sched_getattr(pid, attr, size, flags) \
-  syscall(__NR_sched_getattr, pid, attr, size, flags)
+int sched_setattr(pid_t pid,
+                  const struct sched_attr *attr,
+                  unsigned int flags);
 
-#define sched_setattr(pid, attr, flags) \
-  syscall(__NR_sched_setattr, pid, attr)
+int sched_getattr(pid_t pid,
+                  struct sched_attr *attr,
+                  unsigned int size,
+                  unsigned int flags);
 
-#endif //__SCHED_NEW_H__
+#endif // SCHED_NEW_H
