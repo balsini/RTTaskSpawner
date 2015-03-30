@@ -39,7 +39,10 @@ void task_init(periodic_task_attr *pta)
 void task_body(periodic_task_attr *pta)
 {
   unsigned int i;
+  unsigned int every;
   struct timespec now;
+
+  every = 0;
 
   //pthread_mutex_lock(&console_mux);
   //printf("Into Task Body [ %ld ]\n", gettid());
@@ -58,7 +61,9 @@ void task_body(periodic_task_attr *pta)
     //print_time(&now);
 
     // Self suspension
-    susp_wait(pta->ss);
+    every = (every + 1) % pta->ss_every;
+    if (every == 0)
+      susp_wait(pta->ss);
 
     //clock_gettime(CLOCK_MONOTONIC, &now);
     //print_time(&now);
