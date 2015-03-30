@@ -28,8 +28,8 @@ int main()
   periodic_task_attr p;
 
   p.c0 = 10;
-  p.c1 = 5;
   p.ss = 5;
+  p.c1 = 5;
   p.ss_every = 3;
   p.jobs = 50;
 

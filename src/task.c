@@ -1,8 +1,16 @@
-#include "task.h"
+#include <time.h>
 
+#include "task.h"
 #include "periodicity.h"
 
 pthread_mutex_t console_mux = PTHREAD_MUTEX_INITIALIZER;
+
+void print_time(const struct timespec *t)
+{
+  pthread_mutex_lock(&console_mux);
+  printf("Time: %lld.%ld\n", (long long)t->tv_sec, t->tv_nsec);
+  pthread_mutex_unlock(&console_mux);
+}
 
 void task_init(periodic_task_attr *pta)
 {
@@ -30,24 +38,38 @@ void task_init(periodic_task_attr *pta)
 
 void task_body(periodic_task_attr *pta)
 {
-  unsigned int i, j;
+  unsigned int i;
+  struct timespec now;
 
-  pthread_mutex_lock(&console_mux);
-  printf("Into Task Body [ %ld ]\n", gettid());
-  pthread_mutex_unlock(&console_mux);
+  //pthread_mutex_lock(&console_mux);
+  //printf("Into Task Body [ %ld ]\n", gettid());
+  //pthread_mutex_unlock(&console_mux);
 
   set_period(pta);
 
   for (i=0; i<pta->jobs; ++i) {
+    //clock_gettime(CLOCK_MONOTONIC, &now);
+    //print_time(&now);
 
-    static struct timespec t;
+    // Busy wait for c0
+    busy_wait(pta->c0);
 
-    clock_gettime(CLOCK_MONOTONIC, &t);
+    //clock_gettime(CLOCK_MONOTONIC, &now);
+    //print_time(&now);
 
-    // DO STUFF
-    //for (j=0; j<10000; j++) ;
+    // Self suspension
+    susp_wait(pta->ss);
 
-    printf("Do stuff %d [ %ld ]\n", i, gettid());
+    //clock_gettime(CLOCK_MONOTONIC, &now);
+    //print_time(&now);
+
+    // Wait for c1
+    busy_wait(pta->c1);
+
+    //clock_gettime(CLOCK_MONOTONIC, &now);
+    //print_time(&now);
+
+    //printf("\n");
 
     wait_for_period(pta);
   }
