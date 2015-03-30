@@ -3,18 +3,18 @@
 #include <sys/types.h>
 
 #include "task.h"
-
+#include "periodicity.h"
 
 #define gettid() syscall(__NR_gettid)
 
 unsigned int thread_count;
 pthread_t thread_list[100];
 
-void create_thread(struct task_parameters param)
+void create_task(periodic_task_attr *param)
 {
   printf("Creating task\n");
 
-  pthread_create(&thread_list[thread_count], NULL, task_main, (void *)&param);
+  pthread_create(&thread_list[thread_count], NULL, task_main, (void *)param);
 
   thread_count++;
 }
@@ -25,22 +25,22 @@ int main()
 
   printf("Spawner started\n");
 
-  struct task_parameters p;
+  periodic_task_attr p;
 
-  p.c0.tv_sec = 0;
-  p.c0.tv_nsec = 10 * 1000;
-  p.c1.tv_sec = 0;
-  p.c1.tv_nsec = 10 * 1000;
-  p.ss.tv_sec = 0;
-  p.ss.tv_nsec = 10 * 1000;
+  p.c0 = 10;
+  p.c1 = 5;
+  p.ss = 5;
+  p.ss_every = 3;
+  p.jobs = 50;
 
-  p.ss_every = 0;
+  p.period = 40;
+  p.deadline = 40;
 
-  p.attr.size = sizeof(p.attr);
-  p.attr.sched_deadline = p.attr.sched_period = 10 * 1000 * 1000;
-  p.attr.sched_runtime = 5 * 1000 * 1000;
+  p.s_deadline = 40;
+  p.s_period = 40;
+  p.s_runtime = 30;
 
-  create_thread(p);
+  create_task(&p);
 
   while (thread_count) {
     thread_count--;

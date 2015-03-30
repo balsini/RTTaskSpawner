@@ -12,7 +12,7 @@
  * Copies the second passed time to the first one
  */
 
-inline void time_copy(struct timespec * dst, const struct timespec * src)
+inline void time_copy(struct timespec *dst, const struct timespec *src)
 {
 	dst->tv_sec = src->tv_sec;
 	dst->tv_nsec = src->tv_nsec;
@@ -22,7 +22,7 @@ inline void time_copy(struct timespec * dst, const struct timespec * src)
  * Adds milliseconds to the given time
  */
 
-inline void time_add_ms(struct timespec * dst, long int ms)
+inline void time_add_ms(struct timespec *dst, long int ms)
 {
 	dst->tv_sec += ms/1000;
 	dst->tv_nsec += (ms % 1000) * 1e6;
@@ -40,7 +40,7 @@ inline void time_add_ms(struct timespec * dst, long int ms)
  * 		-1 otherwise
  */
 
-inline int time_cmp(struct timespec * t1, struct timespec * t2)
+inline int time_cmp(struct timespec *t1, struct timespec *t2)
 {
 	if (t1->tv_sec > t2->tv_sec) return 1;
 	if (t1->tv_sec < t2->tv_sec) return -1;
@@ -58,7 +58,7 @@ inline int time_cmp(struct timespec * t1, struct timespec * t2)
  * 		1 otherwise.
  */
 
-inline int deadline_miss(periodic_task_attr * ta)
+inline int deadline_miss(periodic_task_attr *ta)
 {
 	static struct timespec now;
 
@@ -76,7 +76,7 @@ inline int deadline_miss(periodic_task_attr * ta)
  * Computes the next activation point of the task
  */
 
-inline void set_period(periodic_task_attr * ta)
+inline void set_period(periodic_task_attr *ta)
 {
 	static struct timespec t;
 
@@ -92,7 +92,7 @@ inline void set_period(periodic_task_attr * ta)
  * awakened, updates it's activation time and deadline.
  */
 
-inline void wait_for_period(periodic_task_attr * ta)
+inline void wait_for_period(periodic_task_attr *ta)
 {
 	deadline_miss(ta);
 	//printf("Waiting for period\n");
