@@ -21,26 +21,41 @@ void create_task(periodic_task_attr *param)
 
 int main()
 {
+  periodic_task_attr p0, p1;
+
   thread_count = 0;
 
   printf("Spawner started\n");
 
-  periodic_task_attr p;
+  p0.c0 = 10;
+  p0.ss = 30;
+  p0.c1 = 10;
+  p0.ss_every = 0;
+  p0.jobs = 50;
 
-  p.c0 = 10;
-  p.ss = 5;
-  p.c1 = 5;
-  p.ss_every = 3;
-  p.jobs = 50;
+  p0.period = 100;
+  p0.deadline = 100;
 
-  p.period = 40;
-  p.deadline = 40;
+  p0.s_deadline = 100;
+  p0.s_period = 100;
+  p0.s_runtime = 60;
 
-  p.s_deadline = 40;
-  p.s_period = 40;
-  p.s_runtime = 30;
 
-  create_task(&p);
+  p1.c0 = 30;
+  p1.ss = 0;
+  p1.c1 = 0;
+  p1.ss_every = 999999;
+  p1.jobs = 50;
+
+  p1.period = 50;
+  p1.deadline = 50;
+
+  p1.s_deadline = 50;
+  p1.s_period = 50;
+  p1.s_runtime = 40;
+
+  create_task(&p0);
+  create_task(&p1);
 
   while (thread_count) {
     thread_count--;
