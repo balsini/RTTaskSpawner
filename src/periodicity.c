@@ -119,19 +119,6 @@ void susp_wait(int ms)
 {
   struct timespec t;
 
-  clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
-  time_add_ms(&t, ms);
-  clock_nanosleep(CLOCK_THREAD_CPUTIME_ID, TIMER_ABSTIME, &t, NULL);
-}
-
-/*
- * Suspends the calling thread for a certain number of ms in a
- * suspending wait fashion.
- */
-void susp_wait_global(int ms)
-{
-  struct timespec t;
-
   clock_gettime(CLOCK_MONOTONIC, &t);
   time_add_ms(&t, ms);
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);

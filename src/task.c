@@ -62,7 +62,7 @@ void task_body(periodic_task_attr *pta)
 
     // Self suspension
     every = (every + 1) % pta->ss_every;
-    if (every == 0)
+    if (every == 0 || pta->ss_every == 0)
       susp_wait(pta->ss);
 
     //clock_gettime(CLOCK_MONOTONIC, &now);
