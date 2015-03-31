@@ -18,14 +18,14 @@ void task_init(periodic_task_attr *pta)
   struct sched_attr attr;
 
   attr.size = sizeof(attr);
-  attr.sched_flags = 0;
-  attr.sched_nice = 0;
+  attr.sched_flags =    0;
+  attr.sched_nice =     0;
   attr.sched_priority = 0;
 
-  attr.sched_policy = SCHED_DEADLINE;
-  attr.sched_runtime = pta->s_runtime * 1000 * 1000;
-  attr.sched_period = pta->s_period * 1000 * 1000;
-  attr.sched_deadline = pta->s_deadline * 1000 * 1000;
+  attr.sched_policy =   SCHED_DEADLINE;
+  attr.sched_runtime =  1000 * 1000 * pta->s_runtime;
+  attr.sched_period =   1000 * 1000 * pta->s_period;
+  attr.sched_deadline = 1000 * 1000 * pta->s_deadline;
 
   r = sched_setattr(0, &attr, 0);
   if (r < 0) {
@@ -40,7 +40,7 @@ void task_body(periodic_task_attr *pta)
 {
   unsigned int i;
   unsigned int every;
-  struct timespec now;
+  //struct timespec now;
 
   every = 0;
 

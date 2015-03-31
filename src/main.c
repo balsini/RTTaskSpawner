@@ -28,7 +28,7 @@ int main()
   printf("Spawner started\n");
 
   p0.c0 = 10;
-  p0.ss = 30;
+  p0.ss = 50;
   p0.c1 = 10;
   p0.ss_every = 0;
   p0.jobs = 50;
@@ -38,21 +38,21 @@ int main()
 
   p0.s_deadline = 100;
   p0.s_period = 100;
-  p0.s_runtime = 60;
+  p0.s_runtime = 40;
 
 
-  p1.c0 = 30;
+  p1.c0 = 100;
   p1.ss = 0;
   p1.c1 = 0;
   p1.ss_every = 999999;
   p1.jobs = 50;
 
-  p1.period = 50;
-  p1.deadline = 50;
+  p1.period = 200;
+  p1.deadline = 200;
 
-  p1.s_deadline = 50;
-  p1.s_period = 50;
-  p1.s_runtime = 40;
+  p1.s_deadline = 200;
+  p1.s_period = 200;
+  p1.s_runtime = 100;
 
   create_task(&p0);
   create_task(&p1);

@@ -47,6 +47,7 @@ void set_period(periodic_task_attr * periodic_task_attribute);
 void wait_for_period(periodic_task_attr * periodic_task_attribute);
 void busy_wait(int ms);
 void susp_wait(int ms);
+void susp_wait_global(int ms);
 void time_add_ms(struct timespec *dst, long int ms);
 
 #endif /* __PERIODICITY_H__ */
