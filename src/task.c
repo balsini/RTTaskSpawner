@@ -44,9 +44,9 @@ void task_body(periodic_task_attr *pta)
 
   every = 0;
 
-  //pthread_mutex_lock(&console_mux);
-  //printf("Into Task Body [ %ld ]\n", gettid());
-  //pthread_mutex_unlock(&console_mux);
+  pthread_mutex_lock(&console_mux);
+  printf("Into Task Body [ %ld ]\n", gettid());
+  pthread_mutex_unlock(&console_mux);
 
   set_period(pta);
 
@@ -61,8 +61,9 @@ void task_body(periodic_task_attr *pta)
     //print_time(&now);
 
     // Self suspension
-    every = (every + 1) % pta->ss_every;
-    if (every == 0 || pta->ss_every == 0)
+    if (pta->ss_every > 0)
+      every = (every + 1) % pta->ss_every;
+    if (every == 0)
       susp_wait(pta->ss);
 
     //clock_gettime(CLOCK_MONOTONIC, &now);
