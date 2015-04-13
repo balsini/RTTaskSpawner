@@ -30,6 +30,18 @@ void time_add_ms(struct timespec *dst, long int ms)
   }
 }
 
+/*
+ * Adds nanoseconds to the given time
+ */
+void time_add_ns(struct timespec *dst, long int ns)
+{
+  dst->tv_nsec += ns % (1000 * 1000);
+  if (dst->tv_nsec > 1e9) {
+    dst->tv_nsec -= 1e9;
+    dst->tv_sec++;
+  }
+}
+
 /* Compares two times
  *
  * returns:
@@ -78,8 +90,8 @@ inline void set_period(periodic_task_attr *ta)
   clock_gettime(CLOCK_MONOTONIC, &t);
   time_copy(&(ta->at), &t);
   time_copy(&(ta->dl), &t);
-  time_add_ms(&(ta->at), ta->period);
-  time_add_ms(&(ta->dl), ta->deadline);
+  time_add_ns(&(ta->at), ta->period);
+  time_add_ns(&(ta->dl), ta->deadline);
 }
 
 /*
@@ -91,21 +103,21 @@ inline void wait_for_period(periodic_task_attr *ta)
   deadline_miss(ta);
   //printf("Waiting for period\n");
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &(ta->at), NULL);
-  time_add_ms(&(ta->at), ta->period);
-  time_add_ms(&(ta->dl), ta->period);
+  time_add_ns(&(ta->at), ta->period);
+  time_add_ns(&(ta->dl), ta->period);
   //printf("Woken up\n");
 }
 
 /*
- * Suspends the calling thread for a certain number of ms in a
+ * Suspends the calling thread for a certain number of ns in a
  * busy wait fashion.
  */
-void busy_wait(int ms)
+void busy_wait(int ns)
 {
   struct timespec t, now;
 
   clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
-  time_add_ms(&t, ms);
+  time_add_ns(&t, ns);
   do {
     clock_gettime(CLOCK_THREAD_CPUTIME_ID, &now);
   } while (time_cmp(&now, &t) < 0) ;
@@ -115,11 +127,54 @@ void busy_wait(int ms)
  * Suspends the calling thread for a certain number of ms in a
  * suspending wait fashion.
  */
-void susp_wait(int ms)
+void susp_wait(int ns)
 {
   struct timespec t;
 
   clock_gettime(CLOCK_MONOTONIC, &t);
-  time_add_ms(&t, ms);
+  time_add_ns(&t, ns);
   clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &t, NULL);
+}
+
+void print_pta(periodic_task_attr *p)
+{
+  printf("jobs:\t\t%d\n", p->jobs);
+  printf("ss_every:\t%d\n", p->ss_every);
+  printf("ss:\t\t%d\n", p->ss);
+  printf("c0:\t\t%d\n", p->c0);
+  printf("c1:\t\t%d\n", p->c1);
+  printf("period:\t\t%d\n", p->period);
+  printf("deadline:\t%d\n", p->deadline);
+  printf("s_period:\t%d\n", p->s_period);
+  printf("s_deadline:\t%d\n", p->s_deadline);
+  printf("s_runtime:\t%d\n", p->s_runtime);
+}
+
+void print_pta_json(periodic_task_attr p[], unsigned int size)
+{
+  unsigned int i;
+
+  printf("{\n");
+  printf("\t\"tasks\" : {\n");
+
+  for (i=0; i<size; ++i) {
+    printf("\t\t\"thread%d\" : {\n", i);
+
+    printf("\t\t\t\"jobs\":\t\t%ld.0,\n", p[i].jobs);
+    printf("\t\t\t\"ss_every\":\t%ld.0,\n", p[i].ss_every);
+    printf("\t\t\t\"ss\":\t\t%ld.0,\n", p[i].ss);
+    printf("\t\t\t\"c0\":\t\t%ld.0,\n", p[i].c0);
+    printf("\t\t\t\"c1\":\t\t%ld.0,\n", p[i].c1);
+    printf("\t\t\t\"period\":\t%ld.0,\n", p[i].period);
+    printf("\t\t\t\"deadline\":\t%ld.0,\n", p[i].deadline);
+    printf("\t\t\t\"s_period\":\t%ld.0,\n", p[i].s_period);
+    printf("\t\t\t\"s_deadline\":\t%ld.0,\n", p[i].s_deadline);
+    printf("\t\t\t\"s_runtime\":\t%ld.0\n", p[i].s_runtime);
+
+    if (i == size-1)
+      printf("\t\t}\n");
+    else
+      printf("\t\t},\n");
+  }
+  printf("\t}\n}\n");
 }

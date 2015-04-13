@@ -4,11 +4,14 @@
 
 #include "task.h"
 #include "periodicity.h"
+#include "json_inout.h"
 
 #define gettid() syscall(__NR_gettid)
 
+#define TASK_NUM_MAX 50
+
 unsigned int thread_count;
-pthread_t thread_list[100];
+pthread_t *thread_list;
 
 void create_task(periodic_task_attr *param)
 {
@@ -21,46 +24,33 @@ void create_task(periodic_task_attr *param)
 
 int main()
 {
-  periodic_task_attr p0, p1;
+  periodic_task_attr *p;
+  unsigned int i;
+  unsigned int size = 50;
 
   thread_count = 0;
-
+  
   printf("Spawner started\n");
 
-  p0.c0 = 10;
-  p0.ss = 50;
-  p0.c1 = 10;
-  p0.ss_every = 0;
-  p0.jobs = 50;
+  parse_config_stdin(&p, &size);
 
-  p0.period = 100;
-  p0.deadline = 100;
+  thread_list = (pthread_t *)malloc(sizeof(pthread_t) * size);
 
-  p0.s_deadline = 100;
-  p0.s_period = 100;
-  p0.s_runtime = 40;
+  print_pta_json(p, size);
 
+  printf("Creating %d threads\n", size);
 
-  p1.c0 = 100;
-  p1.ss = 0;
-  p1.c1 = 0;
-  p1.ss_every = 999999;
-  p1.jobs = 50;
-
-  p1.period = 200;
-  p1.deadline = 200;
-
-  p1.s_deadline = 200;
-  p1.s_period = 200;
-  p1.s_runtime = 100;
-
-  create_task(&p0);
-  create_task(&p1);
+  for (i=0; i<size; ++i)
+    create_task(&p[i]);
 
   while (thread_count) {
     thread_count--;
     pthread_join(thread_list[thread_count], NULL);
+    printf("[%d/%d]\n", thread_count, size);
   }
+
+  free(thread_list);
+  free(p);
 
   printf("Spawner ended\n");
   return 0;

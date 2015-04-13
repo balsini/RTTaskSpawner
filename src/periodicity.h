@@ -26,16 +26,16 @@ typedef struct periodic_task_attr_ {
   int jobs;		// Number of jobs for each task
   int ss_every;		// The task Self-Suspends after every ss_every
 			//   activations
-  int ss;		// The task Self-Suspends after ss_every activations
-  int c0;		// Duration of C0
-  int c1;		// Duration of C1
+  long int ss;		// The task Self-Suspends after ss_every activations
+  long int c0;		// Duration of C0
+  long int c1;		// Duration of C1
 
-  int period;		// task period
-  int deadline;		// task deadline
+  long int period;		// task period
+  long int deadline;		// task deadline
 
-  int s_period;		// server period
-  int s_deadline;	// server deadline
-  int s_runtime;	// server runtime that will be used
+  long int s_period;		// server period
+  long int s_deadline;	// server deadline
+  long int s_runtime;	// server runtime that will be used
                         //   by CBS for bandwidth management
 
   struct timespec at;	// next activation time
@@ -45,8 +45,11 @@ typedef struct periodic_task_attr_ {
 void periodicity_init();
 void set_period(periodic_task_attr * periodic_task_attribute);
 void wait_for_period(periodic_task_attr * periodic_task_attribute);
-void busy_wait(int ms);
-void susp_wait(int ms);
+void busy_wait(int ns);
+void susp_wait(int ns);
 void time_add_ms(struct timespec *dst, long int ms);
+void time_add_ns(struct timespec *dst, long int ms);
+void print_pta(periodic_task_attr *p);
+void print_pta_json(periodic_task_attr p[], unsigned int size);
 
 #endif /* __PERIODICITY_H__ */

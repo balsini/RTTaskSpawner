@@ -8,7 +8,7 @@ pthread_mutex_t console_mux = PTHREAD_MUTEX_INITIALIZER;
 void print_time(const struct timespec *t)
 {
   pthread_mutex_lock(&console_mux);
-  printf("Time: %lld.%ld\n", (long long)t->tv_sec, t->tv_nsec);
+  printf("[ %ld ] Time: %lld.%ld\n", gettid(), (long long)t->tv_sec, t->tv_nsec);
   pthread_mutex_unlock(&console_mux);
 }
 
@@ -23,14 +23,18 @@ void task_init(periodic_task_attr *pta)
   attr.sched_priority = 0;
 
   attr.sched_policy =   SCHED_DEADLINE;
-  attr.sched_runtime =  1000 * 1000 * pta->s_runtime;
-  attr.sched_period =   1000 * 1000 * pta->s_period;
-  attr.sched_deadline = 1000 * 1000 * pta->s_deadline;
+  attr.sched_runtime =  pta->s_runtime;
+  attr.sched_period =   pta->s_period;
+  attr.sched_deadline = pta->s_deadline;
 
   r = sched_setattr(0, &attr, 0);
   if (r < 0) {
     pthread_mutex_lock(&console_mux);
     perror("ERROR: sched_setattr");
+    printf("runtime: %lld\nperiod: %lld\ndeadline: %lld\n",
+           attr.sched_runtime,
+           attr.sched_period,
+           attr.sched_deadline);
     pthread_mutex_unlock(&console_mux);
     pthread_exit(NULL);
   }
@@ -94,5 +98,5 @@ void *task_main(void *arg)
   printf("Thread completed [ %ld ]\n", gettid());
   pthread_mutex_unlock(&console_mux);
 
-  return NULL;
+  pthread_exit(0);
 }
