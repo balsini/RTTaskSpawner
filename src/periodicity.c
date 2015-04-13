@@ -140,14 +140,14 @@ void print_pta(periodic_task_attr *p)
 {
   printf("jobs:\t\t%d\n", p->jobs);
   printf("ss_every:\t%d\n", p->ss_every);
-  printf("ss:\t\t%d\n", p->ss);
-  printf("c0:\t\t%d\n", p->c0);
-  printf("c1:\t\t%d\n", p->c1);
-  printf("period:\t\t%d\n", p->period);
-  printf("deadline:\t%d\n", p->deadline);
-  printf("s_period:\t%d\n", p->s_period);
-  printf("s_deadline:\t%d\n", p->s_deadline);
-  printf("s_runtime:\t%d\n", p->s_runtime);
+  printf("ss:\t\t%ld\n", p->ss);
+  printf("c0:\t\t%ld\n", p->c0);
+  printf("c1:\t\t%ld\n", p->c1);
+  printf("period:\t\t%ld\n", p->period);
+  printf("deadline:\t%ld\n", p->deadline);
+  printf("s_period:\t%ld\n", p->s_period);
+  printf("s_deadline:\t%ld\n", p->s_deadline);
+  printf("s_runtime:\t%ld\n", p->s_runtime);
 }
 
 void print_pta_json(periodic_task_attr p[], unsigned int size)
@@ -160,8 +160,8 @@ void print_pta_json(periodic_task_attr p[], unsigned int size)
   for (i=0; i<size; ++i) {
     printf("\t\t\"thread%d\" : {\n", i);
 
-    printf("\t\t\t\"jobs\":\t\t%ld.0,\n", p[i].jobs);
-    printf("\t\t\t\"ss_every\":\t%ld.0,\n", p[i].ss_every);
+    printf("\t\t\t\"jobs\":\t\t%d.0,\n", p[i].jobs);
+    printf("\t\t\t\"ss_every\":\t%d.0,\n", p[i].ss_every);
     printf("\t\t\t\"ss\":\t\t%ld.0,\n", p[i].ss);
     printf("\t\t\t\"c0\":\t\t%ld.0,\n", p[i].c0);
     printf("\t\t\t\"c1\":\t\t%ld.0,\n", p[i].c1);

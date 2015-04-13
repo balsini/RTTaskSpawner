@@ -140,7 +140,6 @@ get_double_value_from(struct json_object *where,
   struct json_object *value;
   double i_value;
   value = get_in_object(where, key, have_def);
-  set_default_if_needed(key, value, have_def, def_value);
   assure_type_is(value, where, key, json_type_double);
   i_value = json_object_get_double(value);
   json_object_put(value);
@@ -573,7 +572,7 @@ parse_global(struct json_object *global, rtapp_options_t *opts)
 static void
 get_opts_from_json_object(struct json_object *root, periodic_task_attr *p[], unsigned int *size/*, rtapp_options_t *opts*/)
 {
-  struct json_object *global, *tasks, *resources;
+  struct json_object *tasks;//, *resources, *global;
 
   if (is_error(root)) {
     printf("Error while parsing input JSON: %s\n",
