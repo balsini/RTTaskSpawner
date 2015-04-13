@@ -30,7 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define PFL "         "PFX
 #define PIN PFX"    "
 #define PIN2 PIN"    "
-#define JSON_FILE_BUF_SIZE 16348
+#define JSON_FILE_BUF_SIZE 4096
+#define FILESIZE_JSON 1000 * 1000
 
 /* redefine foreach as in <json/json_object.h> but to be ANSI
  * compatible */
@@ -604,11 +605,15 @@ parse_config_stdin(periodic_task_attr *p[], unsigned int *size)
   /* read from stdin until EOF, write to temp file and parse
      * as a "normal" config file */
   size_t in_length;
-  char buf[JSON_FILE_BUF_SIZE];
+  //char buf[JSON_FILE_BUF_SIZE];
+  char *buf;
   struct json_object *js;
   printf("Reading JSON config from stdin...\n");
 
-  in_length = fread(buf, sizeof(char), JSON_FILE_BUF_SIZE, stdin);
+  buf = (char *)malloc(sizeof(char) * FILESIZE_JSON);
+
+  //in_length = fread(buf, sizeof(char), JSON_FILE_BUF_SIZE, stdin);
+  in_length = fread(buf, sizeof(char), FILESIZE_JSON, stdin);
   buf[in_length] = '\0';
   js = json_tokener_parse(buf);
   get_opts_from_json_object(js, p, size);
