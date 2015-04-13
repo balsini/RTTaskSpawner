@@ -30,7 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define PFL "         "PFX
 #define PIN PFX"    "
 #define PIN2 PIN"    "
-#define JSON_FILE_BUF_SIZE 4096
+#define JSON_FILE_BUF_SIZE 16348
 
 /* redefine foreach as in <json/json_object.h> but to be ANSI
  * compatible */
