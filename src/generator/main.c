@@ -11,10 +11,11 @@
 int main(int argc, char *argv[])
 {
   periodic_task_attr *p;
-  unsigned int size = 10;
+  unsigned int size = 64;
+  float U_lb = 0.005;
+  float U_tot = 0.8;
   int c;
   char *tvalue = NULL;
-
 
   opterr = 0;
   while ((c = getopt (argc, argv, "t:")) != -1) {
@@ -39,13 +40,19 @@ int main(int argc, char *argv[])
     }
   }
 
+  if (U_lb * size > U_tot) {
+	  printf("The system cannot generate the desired configuration:\n");
+	  printf("For generating a taskset of [%d] tasks with [%f], you need a U_lb of at maximum [%f]\n", size, U_tot, U_tot / size);
+	  return -1;
+  }
+
   random_task_generator(&p,
                         size,
-                        0.01,
-                        0.8,
-                        100 * 1000,
-                        1 * 1000 * 1000,
-                        500);
+                        U_lb,
+                        U_tot,
+                        1000 * 1000,
+                        10 * 1000 * 1000,
+                        100);
 
   //printf("Creating %d threads\n", size);
 

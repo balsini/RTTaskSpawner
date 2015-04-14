@@ -5,6 +5,37 @@
 
 #include <stdio.h>
 
+
+void print_pta_json(periodic_task_attr p[], unsigned int size)
+{
+  unsigned int i;
+
+  printf("{\n");
+  printf("\t\"tasks\" : {\n");
+
+  for (i=0; i<size; ++i) {
+      printf("\t\t\"thread%d\" : {\n", i);
+
+      printf("\t\t\t\"jobs\":\t\t%d.0,\n", p[i].jobs);
+      printf("\t\t\t\"ss_every\":\t%d.0,\n", p[i].ss_every);
+      printf("\t\t\t\"ss\":\t\t%ld.0,\n", p[i].ss);
+      printf("\t\t\t\"c0\":\t\t%ld.0,\n", p[i].c0);
+      printf("\t\t\t\"c1\":\t\t%ld.0,\n", p[i].c1);
+      printf("\t\t\t\"period\":\t%ld.0,\n", p[i].period);
+      printf("\t\t\t\"deadline\":\t%ld.0,\n", p[i].deadline);
+      printf("\t\t\t\"s_period\":\t%ld.0,\n", p[i].s_period);
+      printf("\t\t\t\"s_deadline\":\t%ld.0,\n", p[i].s_deadline);
+      printf("\t\t\t\"s_runtime\":\t%ld.0\n", p[i].s_runtime);
+
+      if (i == size-1)
+        printf("\t\t}\n");
+      else
+        printf("\t\t},\n");
+  }
+  printf("\t}\n}\n");
+}
+
+
 /*
  * Generates the utilization factors
  */
@@ -14,44 +45,41 @@ void random_task_generator_U(float U[],
                              float U_tot)
 {
   int i, j;
-  unsigned int U_big;
-  float U_tot_d = 0;
+  float U_sum;
   float app;
-  float granularity = 10.0 * 1000.0;
+  float *U_tmp;
+  double m, q;
 
-  // Generating random values
+  U_tmp = (float *)malloc(sizeof(float) * size);
+
+  U_sum = 0;
   for (i=0; i<size; ++i) {
-    do {
-      U_big = rand() % ((int)(U_tot * granularity));
-    } while (U_big < U_lb * granularity);
-
-    U[i] = U_big / granularity;
-    //printf("U[%d]: %f\n", i, U[i]);
+      U_tmp[i] = (double)rand() / RAND_MAX;
+      U_sum += U_tmp[i];
   }
 
   // Reordering array
   for (i=0; i<size; ++i) {
-    for (j=0; j<size - i - 1; ++j) {
-      if (U[j] > U[j+1]) {
-        app = U[j];
-        U[j] = U[j+1];
-        U[j+1] = app;
+      for (j=0; j<size - i - 1; ++j) {
+          if (U_tmp[j] > U_tmp[j+1]) {
+              app = U_tmp[j];
+              U_tmp[j] = U_tmp[j+1];
+              U_tmp[j+1] = app;
+          }
       }
-    }
   }
 
-  // Assigning correct utilization factors
-  U[0] -= U_lb;
-  U[size - 1] = U_tot - U[size - 2];
-  for (i=size-2; i>0; i--)
-    U[i] -= U[i - 1];
+  m = (U_tot - size * U_lb) / (U_sum - size * U_tmp[0]);
+  q = U_lb / m - U_tmp[0];
 
+  U_sum = 0;
   for (i=0; i<size; ++i) {
-    //printf("U[%d]:\t%f\n", i, U[i]);
-    U_tot_d += U[i];
+      U[i] = (U_tmp[i] + q) * m;
+      U_sum += U[i];
+      //printf("U[%d]:\t%f\n", i, U[i]);
   }
 
-  //printf("U_tot:\t%f\n", U_tot_d);
+  //printf("U_sum:\t%f\n", U_sum);
 }
 
 /*
@@ -66,11 +94,11 @@ void random_task_generator_T(unsigned int T[],
 
   // Generating random values
   for (i=0; i<size; ++i) {
-    do {
-      T[i] = rand() % (T_max + 1);
-    } while (T[i] < T_min);
+      do {
+          T[i] = rand() % (T_max + 1);
+      } while (T[i] < T_min);
 
-    //printf("T[%d]: %d\n", i, T[i]);
+      //printf("T[%d]: %d\n", i, T[i]);
   }
 }
 
@@ -85,9 +113,9 @@ void random_task_generator_C(unsigned int C[],
   int i;
 
   for (i=0; i<size; ++i) {
-    C[i] = U[i] * T[i];
+      C[i] = U[i] * T[i];
 
-    //printf("C[%d]: %d\n", i, C[i]);
+      //printf("C[%d]: %d\n", i, C[i]);
   }
 }
 
@@ -104,21 +132,21 @@ void random_task_generator_PTA(periodic_task_attr p[],
   unsigned int C_residual;
 
   for (i=0; i<size; ++i) {
-    p[i].ss_every = 0;
-    p[i].jobs = jobs;
+      p[i].ss_every = 0;
+      p[i].jobs = jobs;
 
-    p[i].s_deadline = T[i];
-    p[i].s_period = T[i];
-    p[i].s_runtime = C[i];
+      p[i].s_deadline = T[i];
+      p[i].s_period = T[i];
+      p[i].s_runtime = C[i];
 
-    p[i].period = p[i].s_period;
-    p[i].deadline = p[i].s_deadline;
+      p[i].period = p[i].s_period;
+      p[i].deadline = p[i].s_deadline;
 
-    C_residual = C[i] * 80 / 100;
+      C_residual = C[i] * 80 / 100;
 
-    p[i].c0 = C_residual * 10 / 60;
-    p[i].ss = C_residual * 50 / 60;
-    p[i].c1 = C_residual * 10 / 60;
+      p[i].c0 = C_residual * 10 / 60;
+      p[i].ss = C_residual * 50 / 60;
+      p[i].c1 = C_residual * 10 / 60;
   }
 
   /*
@@ -132,7 +160,7 @@ void random_task_generator_PTA(periodic_task_attr p[],
            p[i].deadline,
            p[i].period);
   }
-  */
+   */
 }
 
 void random_task_generator(periodic_task_attr *p[],
@@ -152,7 +180,7 @@ void random_task_generator(periodic_task_attr *p[],
   U = (float *)malloc(sizeof(float) * size);
   T = (unsigned int *)malloc(sizeof(unsigned int) * size);
   C = (unsigned int *)malloc(sizeof(unsigned int) * size);
-  
+
   srand(time(NULL));
 
   random_task_generator_U(U, size, U_lb, U_tot);
