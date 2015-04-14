@@ -80,6 +80,8 @@ void random_task_generator_U(float U[],
   }
 
   //printf("U_sum:\t%f\n", U_sum);
+
+  free(U_tmp);
 }
 
 /*

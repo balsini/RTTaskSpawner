@@ -12,18 +12,26 @@ int main(int argc, char *argv[])
 {
   periodic_task_attr *p;
   unsigned int size = 64;
-  float U_lb = 0.005;
+  unsigned int jobs = 300;
+  float U_lb = 0.1;
   float U_tot = 0.8;
   int c;
-  char *tvalue = NULL;
 
   opterr = 0;
-  while ((c = getopt (argc, argv, "t:")) != -1) {
+  while ((c = getopt (argc, argv, "t:l:u:j:")) != -1) {
     switch (c)
     {
       case 't':
-        tvalue = optarg;
-        size = atoi(tvalue);
+        size = atoi(optarg);
+        break;
+      case 'j':
+        jobs = atoi(optarg);
+        break;
+      case 'l':
+        U_lb = atof(optarg);
+        break;
+      case 'u':
+        U_tot = atof(optarg);
         break;
       case '?':
         if (optopt == 't')
@@ -40,6 +48,8 @@ int main(int argc, char *argv[])
     }
   }
 
+  //printf("Generating tasks configuration with:\nsize: %d\nU_tot: %f\nU_lb: %f\n", size, U_tot, U_lb);
+
   if (U_lb * size > U_tot) {
 	  printf("The system cannot generate the desired configuration:\n");
 	  printf("For generating a taskset of [%d] tasks with [%f], you need a U_lb of at maximum [%f]\n", size, U_tot, U_tot / size);
@@ -52,7 +62,7 @@ int main(int argc, char *argv[])
                         U_tot,
                         1000 * 1000,
                         10 * 1000 * 1000,
-                        100);
+                        jobs);
 
   //printf("Creating %d threads\n", size);
 
