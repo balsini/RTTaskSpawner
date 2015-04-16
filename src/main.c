@@ -15,7 +15,7 @@ pthread_t *thread_list;
 
 void create_task(periodic_task_attr *param)
 {
-  printf("Creating task\n");
+  //printf("Creating task\n");
 
   pthread_create(&thread_list[thread_count], NULL, task_main, (void *)param);
 
@@ -30,7 +30,7 @@ int main()
 
   thread_count = 0;
   
-  printf("Spawner started\n");
+  //printf("Spawner started\n");
 
   parse_config_stdin(&p, &size);
 
@@ -46,12 +46,12 @@ int main()
   while (thread_count) {
     thread_count--;
     pthread_join(thread_list[thread_count], NULL);
-    printf("[%d/%d]\n", thread_count, size);
+    //printf("[%d/%d]\n", thread_count, size);
   }
 
   free(thread_list);
   free(p);
 
-  printf("Spawner ended\n");
+  //printf("Spawner ended\n");
   return 0;
 }

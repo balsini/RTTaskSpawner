@@ -13,12 +13,14 @@ int main(int argc, char *argv[])
   periodic_task_attr *p;
   unsigned int size = 64;
   unsigned int jobs = 300;
+  unsigned long period_min = 1000 * 1000;
+  unsigned long period_max = 10 * 1000 * 1000;
   float U_lb = 0.1;
   float U_tot = 0.8;
   int c;
 
   opterr = 0;
-  while ((c = getopt (argc, argv, "t:l:u:j:")) != -1) {
+  while ((c = getopt (argc, argv, "t:l:u:j:p:P:")) != -1) {
     switch (c)
     {
       case 't':
@@ -32,6 +34,12 @@ int main(int argc, char *argv[])
         break;
       case 'u':
         U_tot = atof(optarg);
+        break;
+      case 'p':
+        period_min = atof(optarg);
+        break;
+      case 'P':
+        period_max = atof(optarg);
         break;
       case '?':
         if (optopt == 't')
@@ -48,7 +56,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  //printf("Generating tasks configuration with:\nsize: %d\nU_tot: %f\nU_lb: %f\n", size, U_tot, U_lb);
+  //printf("Generating tasks configuration with:\nsize: %d\nU_tot: %f\nU_lb: %f\njobs: %d\n", size, U_tot, U_lb, jobs);
 
   if (U_lb * size > U_tot) {
 	  printf("The system cannot generate the desired configuration:\n");
@@ -60,8 +68,8 @@ int main(int argc, char *argv[])
                         size,
                         U_lb,
                         U_tot,
-                        1000 * 1000,
-                        10 * 1000 * 1000,
+                        period_min,
+                        period_max,
                         jobs);
 
   //printf("Creating %d threads\n", size);

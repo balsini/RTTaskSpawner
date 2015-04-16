@@ -1,7 +1,11 @@
+#define _GNU_SOURCE
+
 #include <time.h>
 
 #include "task.h"
 #include "periodicity.h"
+
+#include <sched.h>
 
 pthread_mutex_t console_mux = PTHREAD_MUTEX_INITIALIZER;
 
@@ -16,6 +20,7 @@ void task_init(periodic_task_attr *pta)
 {
   int r;
   struct sched_attr attr;
+  //cpu_set_t cpu;
 
   attr.size = sizeof(attr);
   attr.sched_flags =    0;
@@ -27,6 +32,21 @@ void task_init(periodic_task_attr *pta)
   attr.sched_period =   pta->s_period;
   attr.sched_deadline = pta->s_deadline;
 
+
+  /*
+
+  CPU_ZERO(&cpu);
+  CPU_SET(1, &cpu);
+
+  r = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t),
+                             &cpu);
+  if (r < 0) {
+    pthread_mutex_lock(&console_mux);
+    perror("ERROR: pthread_setaffinity_np");
+    pthread_mutex_unlock(&console_mux);
+    pthread_exit(NULL);
+  }
+  */
   r = sched_setattr(0, &attr, 0);
   if (r < 0) {
     pthread_mutex_lock(&console_mux);
