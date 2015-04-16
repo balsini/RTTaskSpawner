@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   int c;
 
   opterr = 0;
-  while ((c = getopt (argc, argv, "t:l:u:j:p:P:")) != -1) {
+  while ((c = getopt (argc, argv, "t:U:u:j:p:P:")) != -1) {
     switch (c)
     {
       case 't':
@@ -29,10 +29,10 @@ int main(int argc, char *argv[])
       case 'j':
         jobs = atoi(optarg);
         break;
-      case 'l':
+      case 'u':
         U_lb = atof(optarg);
         break;
-      case 'u':
+      case 'U':
         U_tot = atof(optarg);
         break;
       case 'p':
