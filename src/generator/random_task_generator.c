@@ -101,7 +101,7 @@ void random_task_generator_TC(float U[],
       do {
           T[i] = rand() % (T_max + 1);
           C[i] = U[i] * T[i];
-      } while (T[i] < T_min && C[i] < 1024);
+      } while (T[i] < T_min || C[i] < 1024);
 
       //printf("T[%d]: %d\n", i, T[i]);
   }
