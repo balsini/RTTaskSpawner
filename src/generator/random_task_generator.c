@@ -85,9 +85,11 @@ void random_task_generator_U(float U[],
 }
 
 /*
- * Generates the periods
+ * Generates the periods and runtimes
  */
-void random_task_generator_T(unsigned int T[],
+void random_task_generator_TC(float U[],
+                             unsigned int T[],
+                             unsigned int C[],
                              unsigned int size,
                              unsigned int T_min,
                              unsigned int T_max)
@@ -98,26 +100,10 @@ void random_task_generator_T(unsigned int T[],
   for (i=0; i<size; ++i) {
       do {
           T[i] = rand() % (T_max + 1);
-      } while (T[i] < T_min);
+          C[i] = U[i] * T[i];
+      } while (T[i] < T_min && C[i] < 1024);
 
       //printf("T[%d]: %d\n", i, T[i]);
-  }
-}
-
-/*
- * Generates the computation times
- */
-void random_task_generator_C(unsigned int C[],
-                             unsigned int T[],
-                             float U[],
-                             unsigned int size)
-{
-  int i;
-
-  for (i=0; i<size; ++i) {
-      C[i] = U[i] * T[i];
-
-      //printf("C[%d]: %d\n", i, C[i]);
   }
 }
 
@@ -187,9 +173,7 @@ void random_task_generator(periodic_task_attr *p[],
 
   random_task_generator_U(U, size, U_lb, U_tot);
   //printf("\n");
-  random_task_generator_T(T, size, T_min, T_max);
-  //printf("\n");
-  random_task_generator_C(C, T, U, size);
+  random_task_generator_TC(U, T, C, size, T_min, T_max);
   //printf("\n");
   random_task_generator_PTA(*p, C, T, size, jobs);
 
