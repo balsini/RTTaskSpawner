@@ -35,7 +35,7 @@ void time_add_ms(struct timespec *dst, long int ms)
  */
 void time_add_ns(struct timespec *dst, long int ns)
 {
-  dst->tv_nsec += ns % (1000 * 1000);
+  dst->tv_nsec += ns;
   if (dst->tv_nsec > 1e9) {
     dst->tv_nsec -= 1e9;
     dst->tv_sec++;
