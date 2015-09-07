@@ -133,7 +133,7 @@ void random_task_generator_PTA(periodic_task_attr p[],
       C_residual = C[i] * 80 / 100;
 
       p[i].c0 = C_residual * 10 / 60;
-      p[i].ss = C_residual * 50 / 60;
+      p[i].ss = C_residual * 40 / 60;
       p[i].c1 = C_residual * 10 / 60;
   }
 

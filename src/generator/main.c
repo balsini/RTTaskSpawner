@@ -11,11 +11,11 @@
 int main(int argc, char *argv[])
 {
   periodic_task_attr *p;
-  unsigned int size = 64;
+  unsigned int size = 2;
   unsigned int jobs = 300;
   unsigned long period_min = 1000 * 1000;
   unsigned long period_max = 10 * 1000 * 1000;
-  float U_lb = 0.1;
+  float U_lb = 0.3;
   float U_tot = 0.8;
   int c;
 
