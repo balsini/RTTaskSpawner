@@ -16,6 +16,7 @@
  */
 typedef struct periodic_task_attr_ {
   void * arg;		// task argument
+  int id;
   int dmiss;		// number of deadline misses
 
   // The task acts as follows:
@@ -47,9 +48,10 @@ void set_period(periodic_task_attr * periodic_task_attribute);
 void wait_for_period(periodic_task_attr * periodic_task_attribute);
 void busy_wait(int ns);
 void susp_wait(int ns);
-void time_add_ms(struct timespec *dst, long int ms);
-void time_add_ns(struct timespec *dst, long int ms);
-void print_pta(periodic_task_attr *p);
+struct timespec time_add(struct timespec * t1, struct timespec * t2);
+void time_add_ms(struct timespec * dst, long int ms);
+void time_add_ns(struct timespec * dst, long int ms);
+void print_pta(periodic_task_attr * p);
 void print_pta_json(periodic_task_attr p[], unsigned int size);
 
 #endif /* __PERIODICITY_H__ */

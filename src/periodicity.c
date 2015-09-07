@@ -22,7 +22,7 @@ inline void time_copy(struct timespec *dst, const struct timespec *src)
  */
 void time_add_ms(struct timespec *dst, long int ms)
 {
-  dst->tv_sec += ms/1000;
+  dst->tv_sec += ms / 1000;
   dst->tv_nsec += (ms % 1000) * 1e6;
   if (dst->tv_nsec > 1e9) {
     dst->tv_nsec -= 1e9;
@@ -31,11 +31,28 @@ void time_add_ms(struct timespec *dst, long int ms)
 }
 
 /*
+ * Sums two times and returns the result
+ */
+struct timespec time_add(struct timespec * t1, struct timespec * t2)
+{
+  struct timespec result;
+
+  result.tv_nsec = t1->tv_nsec + t2->tv_nsec;
+  result.tv_sec = t1->tv_sec + t2->tv_sec;
+  if (result.tv_nsec > 1e9) {
+    result.tv_nsec -= 1e9;
+    result.tv_sec++;
+  }
+
+  return result;
+}
+
+/*
  * Adds nanoseconds to the given time
  */
 void time_add_ns(struct timespec *dst, long int ns)
 {
-  dst->tv_nsec += ns % (1000 * 1000);
+  dst->tv_nsec += ns;
   if (dst->tv_nsec > 1e9) {
     dst->tv_nsec -= 1e9;
     dst->tv_sec++;
@@ -73,10 +90,16 @@ inline int deadline_miss(periodic_task_attr *ta)
   clock_gettime(CLOCK_MONOTONIC, &now);
   if (time_cmp(&now, &(ta->dl)) > 0) {
     ta->dmiss++;
-    ta->period++;
-    ta->deadline++;
+    //ta->period++;
+    //ta->deadline++;
     return 1;
   }
+  
+  while (time_cmp(&now, &(ta->dl)) < 0) {
+	  time_add_ns(&(ta->at), ta->period);
+	  time_add_ns(&(ta->dl), ta->period);
+  }
+  
   return 0;
 }
 
